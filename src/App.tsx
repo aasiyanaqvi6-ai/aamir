@@ -327,12 +327,26 @@ useEffect(() => {
     SOCIAL CONTENT
   </h3>
   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-    {socialVideos.map((url, i) => (
+    {[
+         "https://dl.dropboxusercontent.com//scl/fi/m9qnr0g026vkv2d9k0wr9/3.mp4?rlkey=n4gku4i5uibz7sdc15bfs7xnn&st=yuczntkp&dl=0",
+  "https://dl.dropboxusercontent.com/scl/fi/dt90ww8263lixkfdl2nx9/1.mp4?rlkey=5000z7egdgcyst5k5bxgp4h0k&e=1&st=m5arxh58&dl=0",
+   "https://dl.dropboxusercontent.com//scl/fi/7crr0gxiq33qse1a1uczo/4.mp4?rlkey=rxsqyk0lu9p9xraq2t10iutqz&st=4a2d1p5r&dl=0",
+  "https://dl.dropboxusercontent.com//scl/fi/7rlq376jms8u9702wjuqx/6.mp4?rlkey=f70v1uzmodn96ql8zp0md16kz&st=yotkkvak&dl=0",
+   "https://dl.dropboxusercontent.com//scl/fi/yffe9w7h5klo16b7xksjh/2.mp4?rlkey=yain5b1y3mc4pjcjuixknwwoo&st=4u1aatpb&dl=0",
+      "https://dl.dropboxusercontent.com//scl/fi/w8pnrb5dugfj0vkb1g276/7.mp4?rlkey=ycfh3nld11i7re4rodvygm1a3&st=3g6ivfzw&dl=0",
+       "https://dl.dropboxusercontent.com//scl/fi/bq0y0l1v4cul6c6ou03ba/5.mp4?rlkey=p2704q9j4jdqbhmxuio1z5kmp&st=3tuxsvs8&dl=0",
+      "https://dl.dropboxusercontent.com//scl/fi/bvrqsyoo2fxy6mjra1gmu/11.mp4?rlkey=aa77qfbfxu2reewyc3rf8zlrj&st=uc8p6dw5&dl=0",
+     "https://dl.dropboxusercontent.com//scl/fi/tf5f799o3374utm82g8pr/9.mp4?rlkey=yspvsffa4adp98bitasex6inu&st=ib31r8rm&dl=0",
+      "https://dl.dropboxusercontent.com//scl/fi/ehvdk4soail4537lc464b/12.mp4?rlkey=rtpop0dm24iap7bpdvqlezeje&st=s3ndqz5c&dl=0",
+      "https://dl.dropboxusercontent.com//scl/fi/uzay8m6szjb2vtg02bdq0/8.mp4?rlkey=dnh5zqvln9ei730de2zw3bt6h&st=bslb7n84&dl=0",
+      "https://dl.dropboxusercontent.com//scl/fi/ehvdk4soail4537lc464b/12.mp4?rlkey=rtpop0dm24iap7bpdvqlezeje&st=s3ndqz5c&dl=0"
+    ].map((url, i) => (
       <VideoThumbnail
         key={i}
         src={url}
         title={`SOCIAL ${String(i + 1).padStart(2, "0")}`}
         aspectRatio="vertical"
+        thumbnailIndex={i + 11} // Start from 11 (after the 9 featured work videos + showreel)
       />
     ))}
   </div> 
@@ -343,12 +357,23 @@ useEffect(() => {
     FEATURED WORK
   </h3>
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-    {featuredVideos.map((url, i) => (
+    {[
+        "https://dl.dropboxusercontent.com/scl/fi/dt90ww8263lixkfdl2nx9/1.mp4?rlkey=5000z7egdgcyst5k5bxgp4h0k&e=1&st=8lgt0qs9&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/3fd1smvouk3d8rfj995o5/2.mp4?rlkey=z0xyl7kslydggo07cdtk3gbjd&st=dorbjief&dl=0",
+"https://dl.dropboxusercontent.com/scl/fi/ai4op96o3qq0n66un31vc/3.mp4?rlkey=jur8i18pdi0sxv6qfws109g4s&st=k6z3vkg6&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/ke7t8t51nshw3bdw4y92s/4.mp4?rlkey=uk3zmu5eh01txx05slb6mgu8t&st=6g4jvhmp&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/g053bs1mm9fcnt3ecudh5/5.mp4?rlkey=t5hajw5nifzxa4gokecnhcoa9&st=i80734tw&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/awobfzi0eq7ofsoy62854/6.mp4?rlkey=lir6aued5f53ma0yi4gv2hvud&st=d4gd05xo&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/5yq00dxk581hvp1xf2jcz/7.mp4?rlkey=nu9cplt1lh483itpo38yru8yi&st=536np4vi&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/fh0cyd8eilcl1e7x0aq3n/8.mp4?rlkey=jptcjwe2c0owtnavhdvp7jgjr&st=qmdgcimp&dl=0",
+      "https://dl.dropboxusercontent.com/scl/fi/8u4fc1mtblxo5m7l2nu8t/9.mp4?rlkey=df65sar8ds51bw3cf28ns152d&st=z206ud0z&dl=0",
+    ].map((url, i) => (
       <VideoThumbnail
         key={i}
         src={url}
         title={`PROJECT ${String(i + 1).padStart(2, "0")}`}
         isShowreel={false}
+        thumbnailIndex={i + 2} // Start from 2 since showreel uses 1
       />
     ))}
   </div>
