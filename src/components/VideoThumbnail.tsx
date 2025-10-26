@@ -1,57 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Maximize2, X, Play, Pause, Volume2, VolumeX } from "lucide-react";
-import { thumbnailLoadQueue } from "../utils/thumbnailLoadQueue";
+import { videoPreloader } from "../utils/videoPreloader";
 
 const isMobile = () => window.innerWidth < 768;
 
-interface ThumbnailImageProps {
-  src: string;
-  alt: string;
-  isFullscreen: boolean;
-  isPlaying: boolean;
-  onLoad: () => void;
-  onError: () => void;
-}
-
-function ThumbnailImage({ src, alt, isFullscreen, isPlaying, onLoad, onError }: ThumbnailImageProps) {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadImage = () => {
-      return new Promise<void>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-          setImageSrc(src);
-          onLoad();
-          resolve();
-        };
-        img.onerror = () => {
-          onError();
-          reject();
-        };
-        img.src = src;
-      });
-    };
-
-    thumbnailLoadQueue.add(loadImage);
-  }, [src, onLoad, onError]);
-
-  if (!imageSrc) {
-    return null;
-  }
-
-  return (
-    <img
-      src={imageSrc}
-      alt={alt}
-      className={`absolute inset-0 w-full h-full ${
-        isFullscreen ? 'object-contain' : 'object-cover'
-      } transition-opacity duration-300 ${
-        isPlaying ? 'opacity-0' : 'opacity-100'
-      }`}
-    />
-  );
-}
 
 interface VideoThumbnailProps {
   src: string;
@@ -77,7 +29,6 @@ export function VideoThumbnail({
   const [isInView, setIsInView] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
   const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
@@ -87,13 +38,6 @@ export function VideoThumbnail({
 
   const aspectClasses = aspectRatio === "vertical" ? "aspect-[9/16]" : "aspect-video";
 
-  // Get thumbnail path
-  const getThumbnailPath = () => {
-    if (thumbnailIndex) {
-      return `/thumbnails/${thumbnailIndex}.jpg`;
-    }
-    return null;
-  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -105,20 +49,25 @@ export function VideoThumbnail({
           setIsInView(true);
           observer.disconnect();
 
-          // Auto-play for non-showreel videos after a short delay to ensure video element is ready
-          if (!isShowreel) {
-            setTimeout(() => {
-              if (videoRef.current) {
-                setIsLoading(true);
-                videoRef.current.src = src;
-                videoRef.current.muted = true;
-                videoRef.current.load();
-                videoRef.current.play().catch((error) => {
-                  console.error('Error auto-playing video:', error);
-                  setIsLoading(false);
-                });
-              }
-            }, 100);
+          if (!isShowreel && videoRef.current) {
+            const preloadedVideo = videoPreloader.getPreloadedVideo(src);
+            if (preloadedVideo) {
+              videoRef.current.src = src;
+              videoRef.current.muted = true;
+              videoRef.current.load();
+              videoRef.current.play().catch((error) => {
+                console.error('Error auto-playing video:', error);
+              });
+            } else {
+              setIsLoading(true);
+              videoRef.current.src = src;
+              videoRef.current.muted = true;
+              videoRef.current.load();
+              videoRef.current.play().catch((error) => {
+                console.error('Error auto-playing video:', error);
+                setIsLoading(false);
+              });
+            }
           }
         }
       },
@@ -176,11 +125,9 @@ export function VideoThumbnail({
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const playButtonSize = aspectRatio === 'vertical' 
+  const playButtonSize = aspectRatio === 'vertical'
     ? (isFullscreen ? 'w-20 h-20' : 'w-12 h-12')
     : (isFullscreen ? 'w-24 h-24' : 'w-16 h-16');
-
-  const thumbnailPath = getThumbnailPath();
 
   return (
     <div
@@ -192,20 +139,6 @@ export function VideoThumbnail({
       } ${className}`}
       onClick={handleClick}
     >
-      {thumbnailPath && isInView && !hasStartedPlaying && (
-        <ThumbnailImage
-          src={thumbnailPath}
-          alt={`${title} thumbnail`}
-          isFullscreen={isFullscreen}
-          isPlaying={false}
-          onLoad={() => setThumbnailLoaded(true)}
-          onError={() => {
-            console.warn(`Thumbnail not found: ${thumbnailPath}`);
-            setThumbnailLoaded(false);
-          }}
-        />
-      )}
-
       {/* Video element */}
       {isInView && (
         <video
@@ -256,14 +189,9 @@ export function VideoThumbnail({
         />
       )}
 
-      {/* Fallback background when thumbnail is loading or not available */}
-      {(!thumbnailLoaded && !thumbnailPath) && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-          <div className="text-white/40 text-center">
-            <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin mx-auto mb-2" />
-            <p className="text-xs font-bosenAlt">LOADING</p>
-          </div>
-        </div>
+      {/* Fallback background */}
+      {!hasStartedPlaying && !isLoading && (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
       )}
 
       {/* Loading overlay with black background */}
